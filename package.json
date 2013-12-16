@@ -1,0 +1,49 @@
+{
+  "name": "http-rewrite-middleware",
+  "description": "Nginx-inspired (RegExp-based) HTTP Rewrite Middleware for the Connect and Express webservers.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/viart/http-rewrite-middleware",
+  "author": {
+    "name": "Artem Vitiuk",
+    "email": "artem@devart.in.ua"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:viart/http-rewrite-middleware.git"
+  },
+  "bugs": {
+    "url": "https://github.com/viart/http-rewrite-middleware/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/viart/http-rewrite-middleware/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.7.1",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt": "~0.4.1"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.1"
+  },
+  "keywords": [
+    "gruntplugin",
+    "grunt-contrib-connect",
+    "grunt-express",
+    "modrewrite",
+    "rewriterule",
+    "rewrite",
+    "route",
+    "connect",
+    "express"
+  ]
+}
