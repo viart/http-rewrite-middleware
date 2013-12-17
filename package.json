@@ -1,7 +1,7 @@
 {
   "name": "http-rewrite-middleware",
   "description": "Nginx-inspired (RegExp-based) HTTP Rewrite Middleware for the Connect and Express webservers.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/viart/http-rewrite-middleware",
   "author": {
     "name": "Artem Vitiuk",
