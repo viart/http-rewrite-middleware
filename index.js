@@ -1,6 +1,6 @@
 /*
- * grunt-rewrite-middleware
- * https://github.com/viart/grunt-rewrite-middleware
+ * http-rewrite-middleware
+ * https://github.com/viart/http-rewrite-middleware
  *
  * Copyright (c) 2013 Artem Vitiuk
  * Licensed under the MIT license.
