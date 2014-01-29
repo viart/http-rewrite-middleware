@@ -7,25 +7,29 @@
  */
 'use strict';
 
-function Rewriter (rules, grunt) {
+function Rewriter (rules, options) {
+    options = options || {};
+
     this.rules = [];
-    this.initLogger(grunt);
     (rules || []).forEach(this.registerRule, this);
+
+    var nop = function () {};
+    if (options.silent) {
+        this.log = {
+            ok: nop,
+            error: nop,
+            verbose: nop
+        };
+    } else {
+        this.log = {
+            ok: console.log,
+            error: console.error,
+            verbose: options.verbose ? console.log : nop
+        };
+    }
 }
 
 Rewriter.prototype = {
-    log: function (type, message) {
-        console[type === 'ok' ? 'log' : 'error'](message);
-    },
-
-    initLogger: function (grunt) {
-        if (grunt) {
-            this.log = function (type, message) {
-                grunt.log[type](message);
-            };
-        }
-    },
-
     registerRule: function (rule) {
         var type = 'rewrite';
 
@@ -43,10 +47,10 @@ Rewriter.prototype = {
                 redirect: rule.redirect
             });
 
-            this.log('ok', 'Rewrite rule created for: [' + type.toUpperCase() + ': ' + rule.from + ' -> ' + rule.to + '].');
+            this.log.ok('Rewrite rule created for: [' + type.toUpperCase() + ': ' + rule.from + ' -> ' + rule.to + '].');
             return true;
         } else {
-            this.log('error', 'Wrong rule given.');
+            this.log.error('Wrong rule given.');
             return false;
         }
     },
@@ -64,6 +68,7 @@ Rewriter.prototype = {
     },
 
     dispatcher: function (req, res, next) {
+        var logger = this.log.verbose;
         return function (rule) {
             var toUrl;
             if (rule.from.test(req.url)) {
@@ -76,6 +81,10 @@ Rewriter.prototype = {
                     res.setHeader('Location', toUrl);
                     res.end();
                 }
+                logger(
+                    (rule.redirect ? 'redirect ' + rule.redirect : 'rewrite').toUpperCase() + ' > ' +
+                    req.url + ' : ' + rule.from + ' -> ' + toUrl
+                );
                 return true;
             }
         };
@@ -90,9 +99,8 @@ Rewriter.prototype = {
     }
 };
 
-module.exports.getMiddleware = function (rules, grunt) {
-    var rewriter = new Rewriter(rules, grunt);
-    return rewriter.getMiddleware();
+module.exports.getMiddleware = function (rules, options) {
+    return (new Rewriter(rules, options)).getMiddleware();
 };
 
 module.exports.Rewriter = Rewriter;

@@ -4,8 +4,7 @@ var Rewriter = require('../index').Rewriter;
 
 exports.middleware = {
     setUp: function (done) {
-        var nop = function () {};
-        this.rewriter = new Rewriter([], {log: {ok: nop, error: nop}});
+        this.rewriter = new Rewriter([], {silent: true});
         done();
     },
     tearDown: function (done) {
