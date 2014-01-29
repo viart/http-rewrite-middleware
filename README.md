@@ -1,4 +1,4 @@
-# http-rewrite-middleware v0.1.1 [![Build Status](https://travis-ci.org/viart/http-rewrite-middleware.png?branch=master)](https://travis-ci.org/viart/http-rewrite-middleware)
+# http-rewrite-middleware v0.1.2 [![Build Status](https://travis-ci.org/viart/http-rewrite-middleware.png?branch=master)](https://travis-ci.org/viart/http-rewrite-middleware)
 
 > This module makes it possible to redirect (rewrite internally or redirect using HTTP codes) User to the specific URL based on RegExp Rules.
 > The designated successor of [grunt-connect-rewrite](https://github.com/viart/grunt-connect-rewrite).
@@ -91,17 +91,27 @@ grunt.initConfig({
         development: {
             options: {
                 middleware: function (connect, options) {
-                    return [
-                        // RewriteRules support
-                        rewriteModule.getMiddleware([
-                            // ... list of rules here
-                        ], grunt), // <-- passing `grunt` is optional and is used for native Grunt logging
+                    var middlewares = [];
 
-                        // mount filesystem
-                        connect.static(require('path').resolve(options.base))
+                    // RewriteRules support
+                    middlewares.push(rewriteModule.getMiddleware([
+                        // ... list of rules here
+                    ]));
 
-                        // ... any other middleware
-                    ];
+                    if (!Array.isArray(options.base)) {
+                        options.base = [options.base];
+                    }
+
+                    var directory = options.directory || options.base[options.base.length - 1];
+                    options.base.forEach(function (base) {
+                        // Serve static files.
+                        middlewares.push(connect.static(base));
+                    });
+
+                    // Make directory browse-able.
+                    middlewares.push(connect.directory(directory));
+
+                    return middlewares;
                 }
             }
         }
@@ -109,10 +119,19 @@ grunt.initConfig({
 });
 ```
 
+
+## Debugging
+
+In order to debug Rules just add 2nd parameter to the `getMiddleware(...)` call
+as `getMiddleware(..., {verbose: true})` this will enable logging of matched rules.
+The message will explain which `__from__` rule was matched and what was the result of the rewrite.
+
+
 ## Contributing
+
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code.
 
-## Release History
-* 2013.12.17 `v0.1.1` Initial Release
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/viart/http-rewrite-middleware/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+## Release History
+* 2014.01.29 `v0.1.2` Add logging support
+* 2013.12.17 `v0.1.1` Initial Release
