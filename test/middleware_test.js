@@ -1,6 +1,22 @@
 'use strict';
 
-var Rewriter = require('../index').Rewriter;
+var Rewriter = require('../index').Rewriter,
+    res = {
+        statusCode: 0,
+        headers: {},
+        wasEnded: 0,
+        setHeader: function (key, value) {
+            this.headers[key] = value;
+        },
+        end: function () {
+            this.wasEnded++;
+        },
+        _reset: function () {
+            this.wasEnded = 0;
+            this.statusCode = 0;
+            this.headers = {};
+        }
+    };
 
 exports.middleware = {
     setUp: function (done) {
@@ -9,6 +25,7 @@ exports.middleware = {
     },
     tearDown: function (done) {
         delete this.rewriter;
+        res._reset();
         done();
     },
     testWrongRuleRegistration: function (test) {
@@ -48,25 +65,85 @@ exports.middleware = {
 
         test.done();
     },
-    testRegExpRule: function (test) {
+    testInternalRule: function (test) {
         var req = {},
             wasCompleted = 0;
 
-        test.expect(6);
+        test.expect(12);
 
         test.equal(this.rewriter.registerRule({from: '^/fr[o0]m-([^-]+)-(\\d+)\\.html$', to: '/to-$1-$2.html'}), true);
         test.equal(this.rewriter.getRules().length, 1);
 
         req.url = '/fr0m-s0me-123.html';
-        this.rewriter.getMiddleware()(req, null, function () { wasCompleted++; });
+        this.rewriter.getMiddleware()(req, res, function () { wasCompleted++; });
         test.equal(req.url, '/to-s0me-123.html', 'Should change matched URI.');
         test.equal(wasCompleted, 1, 'Should not block other middlewares.');
+        test.equal(res.statusCode, 0, 'Should not change HTTP Status Code.');
+        test.same(res.headers, {}, 'Should not change Headers.');
+        test.equal(res.wasEnded, 0, 'Response should not be ended.');
 
         req.url = '/error-case.html';
         wasCompleted = 0;
-        this.rewriter.getMiddleware()(req, null, function () { wasCompleted++; });
+        res._reset();
+        this.rewriter.getMiddleware()(req, res, function () { wasCompleted++; });
         test.equal(req.url, '/error-case.html', 'Should not change not matched URI.');
         test.equal(wasCompleted, 1, 'Should not block other middlewares.');
+        test.equal(res.statusCode, 0, 'Should not change HTTP Status Code.');
+        test.same(res.headers, {}, 'Should not change Headers.');
+        test.equal(res.wasEnded, 0, 'Response should not be ended.');
+
+        test.done();
+    },
+    testRedirectRule: function (test) {
+        var req = {},
+            wasCompleted = 0;
+
+        test.expect(12);
+
+        test.equal(true,
+            this.rewriter.registerRule({from: '^/fr[o0]m-([^-]+)-(\\d+)\\.html$', to: '/to-$1-$2.html', redirect: 'permanent'})
+        );
+        test.equal(this.rewriter.getRules().length, 1);
+
+        req.url = '/fr0m-s0me-123.html';
+        this.rewriter.getMiddleware()(req, res, function () { wasCompleted++; });
+        test.equal(wasCompleted, 0, 'Should block other middlewares.');
+        test.equal(req.url, '/fr0m-s0me-123.html', 'Should not change matched URI.');
+        test.equal(res.statusCode, 301, 'Should change HTTP Status Code.');
+        test.same(res.headers, {'Location': '/to-s0me-123.html'}, 'Should add the `Location` Header.');
+        test.equal(res.wasEnded, 1, 'Response should be ended.');
+
+        req.url = '/error-case.html';
+        wasCompleted = 0;
+        res._reset();
+        this.rewriter.getMiddleware()(req, res, function () { wasCompleted++; });
+        test.equal(wasCompleted, 1, 'Should not block other middlewares.');
+        test.equal(req.url, '/error-case.html', 'Should not change not matched URI.');
+        test.equal(res.statusCode, 0, 'Should not change HTTP Status Code.');
+        test.same(res.headers, {}, 'Should not change Headers.');
+        test.equal(res.wasEnded, 0, 'Response should not be ended.');
+
+        test.done();
+    },
+    testLogging: function (test) {
+        var req = {},
+            wasCalled = 0;
+
+        this.rewriter.log.verbose = function () {
+            wasCalled++;
+        };
+
+        test.expect(1);
+
+        this.rewriter.registerRule({from: '^/fr[o0]m-([^-]+)-(\\d+)\\.html$', to: '/to-$1-$2.html'});
+
+        req.url = '/fr0m-s0me-123.html';
+        this.rewriter.getMiddleware()(req, res, function () { });
+
+        req.url = '/error-case.html';
+        this.rewriter.getMiddleware()(req, res, function () { });
+
+        test.equal(wasCalled, 1);
 
         test.done();
     }
