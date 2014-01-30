@@ -40,7 +40,7 @@ exports.middleware = {
 
         this.rewriter.dispatcher = function () { wasDispached++; };
 
-        this.rewriter.getMiddleware()({url: '/'}, null, function () { wasCompleted ++; });
+        this.rewriter.getMiddleware()({url: '/'}, null, function () { wasCompleted++; });
         test.equal(wasCompleted, 1, 'Should not block other middlewares.');
         test.equal(wasDispached, 0, 'Should not try to dispatch without RewriteRules.');
 
@@ -58,7 +58,7 @@ exports.middleware = {
         test.equal(this.rewriter.getRules().length, 1);
 
         req.url = '/fr0m-s0me-123.html';
-        this.rewriter.getMiddleware()(req, null, function () { wasCompleted ++; });
+        this.rewriter.getMiddleware()(req, null, function () { wasCompleted++; });
         test.equal(req.url, '/to-s0me-123.html', 'Should change matched URI.');
         test.equal(wasCompleted, 1, 'Should not block other middlewares.');
 

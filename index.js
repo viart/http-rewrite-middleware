@@ -10,9 +10,6 @@
 function Rewriter (rules, options) {
     options = options || {};
 
-    this.rules = [];
-    (rules || []).forEach(this.registerRule, this);
-
     var nop = function () {};
     if (options.silent) {
         this.log = {
@@ -27,6 +24,9 @@ function Rewriter (rules, options) {
             verbose: options.verbose ? console.log : nop
         };
     }
+
+    this.rules = [];
+    (rules || []).forEach(this.registerRule, this);
 }
 
 Rewriter.prototype = {
