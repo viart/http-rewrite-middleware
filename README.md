@@ -1,4 +1,4 @@
-# http-rewrite-middleware v0.1.3 [![Build Status](https://travis-ci.org/viart/http-rewrite-middleware.png?branch=master)](https://travis-ci.org/viart/http-rewrite-middleware)
+# http-rewrite-middleware v0.1.5 [![Build Status](https://travis-ci.org/viart/http-rewrite-middleware.png?branch=master)](https://travis-ci.org/viart/http-rewrite-middleware)
 
 > This module makes it possible to redirect (rewrite internally or redirect using HTTP codes) User to the specific URL based on RegExp Rules.
 > The designated successor of [grunt-connect-rewrite](https://github.com/viart/grunt-connect-rewrite).
