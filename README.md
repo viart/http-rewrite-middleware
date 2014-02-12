@@ -133,6 +133,6 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 
 ## Release History
-* 2014.02.11 `v0.1.4` Fix NPM Readme issue
+* 2014.02.13 `v0.1.5` Fix NPM...
 * 2014.01.29 `v0.1.3` Add logging support
 * 2013.12.17 `v0.1.1` Initial Release
