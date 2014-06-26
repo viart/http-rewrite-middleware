@@ -2,7 +2,7 @@
  * http-rewrite-middleware
  * https://github.com/viart/http-rewrite-middleware
  *
- * Copyright (c) 2013 Artem Vitiuk
+ * Copyright (c) 2014 Artem Vitiuk
  * Licensed under the MIT license.
  */
 'use strict';
@@ -70,7 +70,8 @@ Rewriter.prototype = {
     dispatcher: function (req, res, next) {
         var logger = this.log.verbose;
         return function (rule) {
-            var toUrl;
+            var toUrl,
+                fromUrl = req.url;
             if (rule.from.test(req.url)) {
                 toUrl = req.url.replace(rule.from, rule.to);
                 if (!rule.redirect) {
@@ -83,7 +84,7 @@ Rewriter.prototype = {
                 }
                 logger(
                     (rule.redirect ? 'redirect ' + rule.redirect : 'rewrite').toUpperCase() + ' > ' +
-                    req.url + ' : ' + rule.from + ' -> ' + toUrl
+                    fromUrl + ' -> ' + toUrl + ' | By [' + rule.from + ' : ' + rule.to + ']'
                 );
                 return true;
             }

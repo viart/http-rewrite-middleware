@@ -1,6 +1,5 @@
 {
     "node": true,
-    "es5": true,
     "evil": false,
     "regexdash": true,
 
